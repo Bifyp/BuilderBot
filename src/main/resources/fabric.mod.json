@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "builderbot",
+  "version": "${version}",
+  "name": "BuilderBot",
+  "description": "Server-side Fabric builder bot with task queue and future AI planner.",
+  "authors": ["Bifyp"],
+  "contact": { "homepage": "https://github.com/Bifyp/BuilderBot" },
+  "license": "MIT",
+  "environment": "server",
+  "entrypoints": { "main": ["dev.bifyp.builderbot.BuilderBotMod"] },
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": ">=1.21.8", "fabric-api": "*", "java": ">=21" }
+}
