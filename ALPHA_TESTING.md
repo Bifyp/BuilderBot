@@ -24,12 +24,6 @@
 Нужна Java 21.
 
 ```bash
-gradle build
-```
-
-Если есть Gradle wrapper:
-
-```bash
 ./gradlew build
 ```
 
