@@ -1,6 +1,8 @@
 package dev.bifyp.builderbot.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.bifyp.builderbot.bot.BotManager;
 import dev.bifyp.builderbot.BuilderBotMod;
 import dev.bifyp.builderbot.bot.BuilderBot;
 import net.minecraft.server.command.ServerCommandSource;
@@ -15,7 +17,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class BotCommands {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("bot")
-            .then(literal("spawn").then(argument("name", word()).executes(ctx -> {
+            .then(literal("spawn").requires(BotManager::isOperator).then(argument("name", word()).executes(ctx -> {
                 String name = getString(ctx, "name");
                 BuilderBot bot = BuilderBotMod.BOT_MANAGER.create(name, ctx.getSource());
                 ctx.getSource().sendFeedback(() -> Text.literal("BuilderBot created: " + bot.name()), false);
@@ -26,9 +28,9 @@ public class BotCommands {
                 ctx.getSource().sendFeedback(() -> Text.literal("BuilderBots: " + names), false);
                 return 1;
             }))
-            .then(literal("remove").then(argument("name", word()).executes(ctx -> {
+            .then(literal("remove").requires(BotManager::isOperator).then(argument("name", word()).executes(ctx -> {
                 String name = getString(ctx, "name");
-                boolean removed = BuilderBotMod.BOT_MANAGER.remove(name);
+                boolean removed = BuilderBotMod.BOT_MANAGER.remove(name, ctx.getSource());
                 ctx.getSource().sendFeedback(() -> Text.literal(removed ? "Removed bot: " + name : "Bot not found: " + name), false);
                 return removed ? 1 : 0;
             })))
@@ -42,8 +44,8 @@ public class BotCommands {
         );
     }
 
-    private static int withBot(ServerCommandSource source, String name, BotAction action) {
-        BuilderBot bot = BuilderBotMod.BOT_MANAGER.get(name);
+    private static int withBot(ServerCommandSource source, String name, BotAction action) throws CommandSyntaxException {
+        BuilderBot bot = BuilderBotMod.BOT_MANAGER.get(name, source);
         if (bot == null) {
             source.sendError(Text.literal("Bot not found: " + name));
             return 0;

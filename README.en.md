@@ -44,3 +44,13 @@ Never commit `.env` files, API keys, bot tokens, Telegram sessions, private cert
 ## > STATUS
 
 Documentation format standardized across Bifyp repositories.
+
+## > BOT.PERMISSIONS
+
+- `/bot spawn <name>` and `/bot remove <name>` require Minecraft permission level **2** or higher, even for a bot's owner.
+- `/bot <name> status|stop|pause|resume|wait` require the creating player's UUID or permission level **2** or higher. Name matching is case-insensitive; ownership uses UUIDs, not player names.
+- `/bot list` remains public and shows bot names, not their task/status details.
+- Console and other non-player command sources need permission level **2**; they never receive player ownership privileges.
+- A bot stays owned by its creator if that player loses operator status; they can still use its named commands but cannot spawn/remove bots.
+
+Security regression tests use Java 21, JUnit, Mockito, and Fabric's JUnit launcher. Run `gradle test` (or `./gradlew test` when the wrapper is available).
