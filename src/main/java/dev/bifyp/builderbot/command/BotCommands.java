@@ -17,7 +17,13 @@ public class BotCommands {
         dispatcher.register(literal("bot")
             .then(literal("spawn").then(argument("name", word()).executes(ctx -> {
                 String name = getString(ctx, "name");
-                BuilderBot bot = BuilderBotMod.BOT_MANAGER.create(name, ctx.getSource());
+                BuilderBot bot;
+                try {
+                    bot = BuilderBotMod.BOT_MANAGER.create(name, ctx.getSource());
+                } catch (IllegalArgumentException exception) {
+                    ctx.getSource().sendError(Text.literal(exception.getMessage()));
+                    return 0;
+                }
                 ctx.getSource().sendFeedback(() -> Text.literal("BuilderBot created: " + bot.name()), false);
                 return 1;
             })))
