@@ -39,18 +39,25 @@ public class BuilderBot {
             return;
         }
         TaskResult result = task.tick(this);
+        // A task may report a specific error via fail() before returning.
+        if (state == BotState.ERROR) return;
         if (result == TaskResult.DONE) queue.poll();
-        if (result == TaskResult.FAILED) {
-            lastError = "Task failed: " + task.name();
-            state = BotState.ERROR;
-        }
+        if (result == TaskResult.FAILED) fail("Task failed: " + task.name());
     }
 
     public void enqueue(BotTask task) { queue.add(task); }
     public void stop() { queue.clear(); state = BotState.IDLE; lastError = null; }
-    public void pause() { state = BotState.PAUSED; }
-    public void resume() { if (state == BotState.PAUSED) state = BotState.IDLE; }
-    public void fail(String message) { lastError = message; state = BotState.ERROR; }
+    public void pause() { if (state != BotState.ERROR) state = BotState.PAUSED; }
+    public void resume() {
+        if (state == BotState.PAUSED || state == BotState.ERROR) state = BotState.IDLE;
+    }
+
+    /** Discard the failed task once; resume() continues with the remaining queue. */
+    public void fail(String message) {
+        if (state != BotState.ERROR) queue.poll();
+        lastError = message;
+        state = BotState.ERROR;
+    }
 
     public Text statusText() {
         BotTask task = queue.peek();
